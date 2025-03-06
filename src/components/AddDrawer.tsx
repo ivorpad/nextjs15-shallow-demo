@@ -16,6 +16,19 @@ import {
 interface User {
   id: string;
   name: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  company?: {
+    name: string;
+    catchPhrase?: string;
+  };
+  address?: {
+    street?: string;
+    suite?: string;
+    city?: string;
+    zipcode?: string;
+  };
 }
 
 interface AddDrawerProps {
@@ -119,37 +132,86 @@ export function AddDrawer({ trigger, children, open: controlledOpen, onOpenChang
         </DrawerTrigger>
       )}
       <DrawerContent className="max-h-[100dvh]">
-        <div className="mx-auto w-full max-w-sm">
+        <div className="mx-auto w-full max-w-md p-4">
           <DrawerHeader>
             <DrawerTitle>
-              {userId ? `User Details (ID: ${userId})` : "Add New Item"}
+              {userId ? `User Details (ID: ${userId})` : "All Users"}
             </DrawerTitle>
             <DrawerDescription>
-              {userId ? "View user details" : "Fill in the details to add a new item."}
+              {userId ? "View detailed information about this user" : "Browse all available users."}
             </DrawerDescription>
           </DrawerHeader>
           <div className="p-4">
             <div className="space-y-4">
               {children}
 
-              {loading && <div>Loading users...</div>}
-              {error && <div className="text-red-500">Error: {error}</div>}
+              {loading && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                </div>
+              )}
+              
+              {error && (
+                <div className="text-red-500 p-4 border border-red-200 rounded-md">
+                  Error: {error}
+                </div>
+              )}
 
               {users.length > 0 ? (
-                users.map((user) => (
-                  <div key={user.id} className="p-2 border rounded">
-                    {user.name}
-                  </div>
-                ))
+                <div className="space-y-6">
+                  {users.map((user) => (
+                    <div key={user.id} className="bg-gray-50 p-4 rounded-lg border">
+                      <h3 className="text-lg font-semibold mb-2">{user.name}</h3>
+                      
+                      <div className="grid grid-cols-1 gap-2 text-sm">
+                        <div className="flex">
+                          <span className="font-medium w-24">Email:</span>
+                          <span>{user.email || "N/A"}</span>
+                        </div>
+                        
+                        <div className="flex">
+                          <span className="font-medium w-24">Phone:</span>
+                          <span>{user.phone || "N/A"}</span>
+                        </div>
+                        
+                        <div className="flex">
+                          <span className="font-medium w-24">Website:</span>
+                          <span>{user.website || "N/A"}</span>
+                        </div>
+                        
+                        {user.company && (
+                          <div className="mt-2">
+                            <div className="font-medium mb-1">Company:</div>
+                            <div className="pl-4">
+                              <div>{user.company.name}</div>
+                              {user.company.catchPhrase && (
+                                <div className="text-gray-500 italic">&ldquo;{user.company.catchPhrase}&rdquo;</div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {user.address && (
+                          <div className="mt-2">
+                            <div className="font-medium mb-1">Address:</div>
+                            <div className="pl-4">
+                              {user.address.street && <div>{user.address.street}{user.address.suite ? `, ${user.address.suite}` : ''}</div>}
+                              {user.address.city && <div>{user.address.city}{user.address.zipcode ? `, ${user.address.zipcode}` : ''}</div>}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : !loading && !error ? (
-                <div>No users found</div>
+                <div className="text-center py-8 text-gray-500">No users found</div>
               ) : null}
             </div>
           </div>
           <DrawerFooter>
-            <Button>Save</Button>
             <DrawerClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" className="w-full">Close</Button>
             </DrawerClose>
           </DrawerFooter>
         </div>

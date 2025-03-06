@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AddDrawer } from "@/components/AddDrawer";
-import { OpenUsersButton } from "@/components/OpenUsersButton";
+import { MainContent } from "@/components/MainContent";
 
 export default function MainPage() {
   const pathname = usePathname();
@@ -47,6 +47,7 @@ export default function MainPage() {
     // Update URL to reflect the selected user
     console.log("MainPage - Setting URL to /users/" + id);
     window.history.pushState({}, "", `/users/${id}`);
+    setDrawerOpen(true);
   };
 
   return (
@@ -54,30 +55,17 @@ export default function MainPage() {
       <div className="flex flex-col items-center justify-center gap-4 w-full max-w-4xl">
         <div className="text-3xl font-bold mb-4">My App</div>
         
-        <div className="w-full bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">
-            {userId ? `Viewing User ${userId}` : "Home Page"}
-          </h2>
-          <p className="mb-4">
-            {userId 
-              ? "This content remains visible while the drawer is open."
-              : "Welcome! Click the button below to view user details in a drawer."}
-          </p>
-          
-          {/* Only show the button if drawer is closed */}
-          {!isDrawerOpen && (
-            <div className="my-4">
-              <OpenUsersButton userId="1" onUserSelect={handleUserSelect} />
-            </div>
-          )}
-          
-          {/* Always render the drawer with controlled open state */}
-          <AddDrawer 
-            open={isDrawerOpen}
-            onOpenChange={handleDrawerOpenChange}
-            userId={userId || undefined}
-          />
-        </div>
+        <MainContent 
+          userId={userId}
+          onUserSelect={handleUserSelect}
+        />
+        
+        {/* Always render the drawer with controlled open state */}
+        <AddDrawer 
+          open={isDrawerOpen}
+          onOpenChange={handleDrawerOpenChange}
+          userId={userId || undefined}
+        />
         
         <div className="text-sm text-gray-500 mt-4">
           Current URL: {pathname || ""}
