@@ -2,6 +2,8 @@
 
 import { OpenUsersButton } from "@/components/OpenUsersButton";
 import { HStack } from "@/components/ui/stack";
+import { Button } from "./ui/button";
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -35,7 +37,10 @@ export function UserButtonsGroup({ onUserSelect }: UserButtonsGroupProps) {
             User {user.id}: {user.name}
           </OpenUsersButton>
         ))}
+        <Link href="/settings">
+          <Button>Settings</Button>
+        </Link>
       </HStack>
     </div>
   );
-} 
+}
