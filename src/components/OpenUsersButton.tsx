@@ -2,30 +2,35 @@
 
 import { Button } from "@/components/ui/button";
 import { forwardRef, ButtonHTMLAttributes } from "react";
-import { useAsPath } from "@/hooks/useAsPath";
 
 interface OpenUsersButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
   userId?: string;
+  onUserSelect?: (userId: string) => void;
 }
 
 export const OpenUsersButton = forwardRef<HTMLButtonElement, OpenUsersButtonProps>(
-  ({ className, onClick, userId = "1", ...props }, ref) => {
-    // Get the current path from our hook
-    const currentPath = useAsPath();
-    
+  ({ className, onClick, userId = "1", onUserSelect, ...props }, ref) => {
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      console.log("OpenUsersButton - Current path:", currentPath);
+      console.log("OpenUsersButton - Button clicked for userId:", userId);
       
-      // Call the original onClick if it exists
+      // Call the original onClick if it exists (for drawer trigger)
       if (onClick) {
+        console.log("OpenUsersButton - Calling parent onClick");
         onClick(e);
       }
       
-      // Only navigate if the event wasn't prevented
+      // Only proceed if the event wasn't prevented
       if (!e.defaultPrevented) {
-        console.log("OpenUsersButton - Setting URL to /users/" + userId);
-        window.history.pushState({}, "", `/users/${userId}`);
+        // Call the onUserSelect callback if provided
+        if (onUserSelect) {
+          console.log("OpenUsersButton - Calling onUserSelect with:", userId);
+          onUserSelect(userId);
+        } else {
+          // If no callback provided, update URL directly (fallback)
+          console.log("OpenUsersButton - No onUserSelect provided, setting URL directly");
+          window.history.pushState({ userId }, "", `/users/${userId}`);
+        }
       }
     };
     

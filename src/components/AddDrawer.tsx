@@ -12,7 +12,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { useAsPath } from "@/hooks/useAsPath";
 
 interface User {
   id: string;
@@ -28,62 +27,45 @@ interface AddDrawerProps {
 }
 
 export function AddDrawer({ trigger, children, open: controlledOpen, onOpenChange, userId: propUserId }: AddDrawerProps) {
-  // Get the current path from our hook
-  const asPath = useAsPath();
   const [userId, setUserId] = useState<string | null>(propUserId || null);
+  const [open, setOpen] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Log the userId when it changes
   useEffect(() => {
     console.log("AddDrawer - Current userId:", userId);
   }, [userId]);
   
-  const [open, setOpen] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
   // Update userId when propUserId changes
   useEffect(() => {
-    if (propUserId) {
+    if (propUserId !== undefined) {
       console.log("AddDrawer - Received new userId prop:", propUserId);
       setUserId(propUserId);
     }
   }, [propUserId]);
   
-  // Extract userId from asPath when drawer opens or asPath changes
-  useEffect(() => {
-    if (open) {
-      console.log("AddDrawer - Current asPath:", asPath);
-      const pathMatch = asPath.match(/\/users\/(\w+)/);
-      if (pathMatch && pathMatch[1]) {
-        console.log("AddDrawer - Found userId in asPath:", pathMatch[1]);
-        setUserId(pathMatch[1]);
-      }
-    }
-  }, [open, asPath]);
-  
-  // Handle controlled open state if provided
+  // Handle controlled open state
   useEffect(() => {
     if (controlledOpen !== undefined) {
+      console.log("AddDrawer - Controlled open state changed to:", controlledOpen);
       setOpen(controlledOpen);
     }
   }, [controlledOpen]);
   
-  // Handle open state changes
+  // Handle internal open state changes
   const handleOpenChange = (newOpen: boolean) => {
+    console.log("AddDrawer - handleOpenChange:", newOpen);
     setOpen(newOpen);
     
+    // Notify parent component of open state change
     if (onOpenChange) {
       onOpenChange(newOpen);
     }
-    
-    // If closing and we have a userId in the URL, reset the URL
-    if (!newOpen && userId) {
-      window.history.pushState({}, "", '/');
-    }
   };
 
-  // Fetch data when the drawer opens
+  // Fetch data when the drawer opens or userId changes
   useEffect(() => {
     if (!open) return;
 
@@ -131,9 +113,11 @@ export function AddDrawer({ trigger, children, open: controlledOpen, onOpenChang
 
   return (
     <Drawer open={open} onOpenChange={handleOpenChange} direction="right">
-      <DrawerTrigger asChild>
-        {trigger || <Button variant="outline">Open Drawer</Button>}
-      </DrawerTrigger>
+      {trigger && (
+        <DrawerTrigger asChild>
+          {trigger}
+        </DrawerTrigger>
+      )}
       <DrawerContent className="max-h-[100dvh]">
         <div className="mx-auto w-full max-w-sm">
           <DrawerHeader>
