@@ -27,10 +27,6 @@ export const OpenUsersButton = forwardRef<HTMLButtonElement, OpenUsersButtonProp
         if (onUserSelect) {
           console.log("OpenUsersButton - Calling onUserSelect with:", userId);
           onUserSelect(userId);
-        } else {
-          // If no callback provided, update URL directly (fallback)
-          console.log("OpenUsersButton - No onUserSelect provided, setting URL directly");
-          window.history.pushState({ userId }, "", `/users/${userId}`);
         }
       }
     };

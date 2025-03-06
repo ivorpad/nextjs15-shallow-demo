@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Item } from "./types";
 
 interface UseItemDataOptions<T extends Item> {
@@ -42,7 +42,8 @@ export function useItemData<T extends Item>({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async (itemId?: string) => {
+  // Memoize fetchData to prevent unnecessary re-renders
+  const fetchData = useCallback(async (itemId?: string) => {
     setIsLoading(true);
     setError(null);
 
@@ -69,14 +70,14 @@ export function useItemData<T extends Item>({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [fetchItem, fetchItems, items.length]);
 
   // Fetch data on mount if enabled
   useEffect(() => {
     if (fetchOnMount) {
       fetchData();
     }
-  }, [fetchOnMount]);
+  }, [fetchOnMount, fetchData]);
 
   return {
     items,
